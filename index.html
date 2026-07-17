@@ -1,1 +1,114 @@
-بالطبع! سأكون سعيدًا بمساعدتك. يرجى تحديد الموضوع الذي تود أن تكون الأسئلة عنه.
+``
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة أسئلة وأجوبة</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #ff6347;
+        }
+        .question {
+            font-size: 20px;
+            margin: 20px 0;
+        }
+        .choice {
+            background-color: #87ceeb;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .choice:hover {
+            background-color: #00bfff;
+        }
+        .result {
+            font-size: 24px;
+            margin-top: 20px;
+            display: none;
+            color: #32cd32;
+        }
+    </style>
+</head>
+<body>
+    <h1>لعبة أسئلة وأجوبة عن الحيوانات</h1>
+    <div id="quiz">
+        <div class="question" id="question"></div>
+        <button class="choice" onclick="choose(0)"></button>
+        <button class="choice" onclick="choose(1)"></button>
+        <button class="choice" onclick="choose(2)"></button>
+    </div>
+    <div class="result" id="result"></div>
+    <script>
+        const questions = [
+            {
+                question: "ما هو أسرع حيوان في العالم؟",
+                choices: ["النمري", "الفهد", "الحصان"],
+                answer: 1
+            },
+            {
+                question: "ما هو أكبر حيوان يعيش على الأرض؟",
+                choices: ["الفيل", "الحوت الأزرق", "الدب"],
+                answer: 1
+            },
+            {
+                question: "أي من هذه الحيوانات يعيش في الصحراء؟",
+                choices: ["الدب", "الجمل", "السمكة"],
+                answer: 1
+            },
+            {
+                question: "ما هو الحيوان الذي يمكن أن يطير؟",
+                choices: ["السلحفاة", "الخفاش", "الثعلب"],
+                answer: 1
+            },
+            {
+                question: "ما هو الحيوان الذي يعتبر رمز القوة؟",
+                choices: ["الأرنب", "الأسد", "الطائر"],
+                answer: 1
+            }
+        ];
+        
+        let currentQuestion = 0;
+        let score = 0;
+        
+        function loadQuestion() {
+            if (currentQuestion < questions.length) {
+                document.getElementById("question").innerText = questions[currentQuestion].question;
+                const choices = document.querySelectorAll(".choice");
+                choices.forEach((choice, index) => {
+                    choice.innerText = questions[currentQuestion].choices[index];
+                });
+            } else {
+                showResult();
+            }
+        }
+        
+        function choose(index) {
+            if (index === questions[currentQuestion].answer) {
+                score++;
+            }
+            currentQuestion++;
+            loadQuestion();
+        }
+        
+        function showResult() {
+            document.getElementById("quiz").style.display = 'none';
+            const result = document.getElementById("result");
+            result.innerText = `لقد حصلت على ${score} من ${questions.length}`;
+            result.style.display = 'block';
+        }
+        
+        loadQuestion();
+    </script>
+</body>
+</html>
