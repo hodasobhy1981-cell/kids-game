@@ -4,201 +4,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة أسئلة وأجوبة للأشكال الهندسية</title>
+    <title>لعبة الأشكال الهندسية</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Fredoka', cursive;
-            background: linear-gradient(to right, #ffccbc, #ffab91);
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #f1c40f, #e67e22);
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
         }
         .container {
             background: white;
             border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             padding: 20px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 90%;
             max-width: 400px;
         }
         .shape {
+            margin: 20px 0;
             width: 100px;
             height: 100px;
-            margin: 20px auto;
-        }
-        .button {
-            border: none;
-            border-radius: 30px;
-            padding: 15px 30px;
-            font-size: 18px;
-            margin: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .button:hover {
-            opacity: 0.8;
         }
         #progress {
-            width: 100%;
-            height: 20px;
-            background: #f0f0f0;
-            border-radius: 10px;
             margin-bottom: 20px;
+            height: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
         }
-        #progress span {
-            display: block;
+        #progress-bar {
             height: 100%;
+            background-color: #3498db;
             width: 0;
-            background: #49c72b;
+            border-radius: 5px;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
             border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
         }
         .result {
             display: none;
         }
         .correct {
-            background-color: #4caf50;
+            color: green;
         }
         .wrong {
-            background-color: #f44336;
+            color: red;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="progress"><span></span></div>
+        <div id="progress"><div id="progress-bar"></div></div>
         <div class="shape" id="shape"></div>
         <h2 id="question"></h2>
-        <button class="button" onclick="checkAnswer(0)"></button>
-        <button class="button" onclick="checkAnswer(1)"></button>
-        <button class="button" onclick="checkAnswer(2)"></button>
-        <div class="result" id="result"></div>
-        <button class="button" id="restart" style="display:none;" onclick="restartGame()">إعادة اللعب</button>
+        <div id="options"></div>
+        <button id="next" style="display: none;">التالي</button>
     </div>
-
+    <div class="container result">
+        <h2>نتيجتك: <span id="score"></span>/5</h2>
+        <p id="message"></p>
+        <button onclick="restart()">إعادة اللعب</button>
+    </div>
     <script>
-        const questions = [
-            { shape: 'مربع', options: ['مستطيل', 'مربع', 'مثلث'], draw: drawSquare },
-            { shape: 'دائرة', options: ['قلب', 'نجمة', 'دائرة'], draw: drawCircle },
-            { shape: 'مثلث', options: ['مثلث', 'مستطيل', 'مربع'], draw: drawTriangle },
-            { shape: 'مستطيل', options: ['دائرة', 'مستطيل', 'نجمة'], draw: drawRectangle },
-            { shape: 'نجمة', options: ['قلب', 'نجمة', 'مثلث'], draw: drawStar },
+        const shapes = [
+            { name: "مربع", css: "background: blue; width: 150px; height: 150px;" },
+            { name: "دائرة", css: "background: red; border-radius: 50%; width: 150px; height: 150px;" },
+            { name: "مثلث", css: "width: 0; height: 0; border-left: 75px solid transparent; border-right: 75px solid transparent; border-bottom: 150px solid green;" },
+            { name: "مستطيل", css: "background: orange; width: 200px; height: 100px;" },
+            { name: "نجمة", css: "clip-path: polygon(50% 0%, 63% 35%, 98% 35%, 72% 57%, 80% 91%, 50% 70%, 20% 91%, 28% 57%, 2% 35%, 37% 35%); background: purple; width: 100px; height: 100px;" },
+            { name: "قلب", css: "background: red; width: 100px; height: 100px; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);" }
         ];
+
         let currentQuestion = 0;
         let score = 0;
 
-        function drawSquare() {
-            document.getElementById('shape').style.width = '100px';
-            document.getElementById('shape').style.height = '100px';
-            document.getElementById('shape').style.backgroundColor = '#ff5722';
-            document.getElementById('shape').style.borderRadius = '0';
-        }
-        function drawCircle() {
-            document.getElementById('shape').style.width = '100px';
-            document.getElementById('shape').style.height = '100px';
-            document.getElementById('shape').style.backgroundColor = '#3f51b5';
-            document.getElementById('shape').style.borderRadius = '50%';
-        }
-        function drawTriangle() {
-            const shape = document.getElementById('shape');
-            shape.style.width = '0';
-            shape.style.height = '0';
-            shape.style.borderLeft = '50px solid transparent';
-            shape.style.borderRight = '50px solid transparent';
-            shape.style.borderBottom = '100px solid #ffc107';
-        }
-        function drawRectangle() {
-            document.getElementById('shape').style.width = '150px';
-            document.getElementById('shape').style.height = '100px';
-            document.getElementById('shape').style.backgroundColor = '#8bc34a';
-            document.getElementById('shape').style.borderRadius = '0';
-        }
-        function drawStar() {
-            const star = document.getElementById('shape');
-            star.style.width = '0';
-            star.style.height = '0';
-            star.style.borderLeft = '30px solid transparent';
-            star.style.borderRight = '30px solid transparent';
-            star.style.borderBottom = '50px solid #ffeb3b';
-            star.style.position = 'relative';
-            star.style.transform = 'rotate(35deg)';
-            star.innerHTML = `<div style="position: absolute; width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 50px solid #ffeb3b; top: -30px; left: -30px; transform: rotate(70deg);"></div>`;
-        }
-
         function loadQuestion() {
-            document.getElementById('result').style.display = 'none';
-            const question = questions[currentQuestion];
-            question.draw();
-            document.getElementById('question').innerText = `ما اسم الشكل؟`;
-            document.querySelectorAll('.button').forEach((button, index) => {
-                button.innerText = question.options[index];
-                button.className = 'button';
-            });
+            const shape = shapes[currentQuestion];
+            document.getElementById("shape").setAttribute("style", shape.css);
+            document.getElementById("question").innerText = `ما اسم الشكل؟`;
+            document.getElementById("options").innerHTML = `
+                <button onclick="checkAnswer('${shape.name}')">${shape.name}</button>
+                <button onclick="checkAnswer('${shapes[(currentQuestion + 1) % shapes.length].name}')">${shapes[(currentQuestion + 1) % shapes.length].name}</button>
+                <button onclick="checkAnswer('${shapes[(currentQuestion + 2) % shapes.length].name}')">${shapes[(currentQuestion + 2) % shapes.length].name}</button>
+            `;
+            document.getElementById("next").style.display = "none";
             updateProgress();
         }
 
-        function checkAnswer(index) {
-            const question = questions[currentQuestion];
-            const selectedAnswer = question.options[index];
-            const result = document.getElementById('result');
+        function updateProgress() {
+            const progressBar = document.getElementById("progress-bar");
+            progressBar.style.width = (currentQuestion + 1) * 20 + '%';
+        }
 
-            if (selectedAnswer === question.shape) {
+        function checkAnswer(answer) {
+            const shape = shapes[currentQuestion];
+            const nextButton = document.getElementById("next");
+            if (answer === shape.name) {
                 score++;
-                result.innerText = '✅ إجابة صحيحة!';
-                result.className = 'correct';
+                nextButton.innerText = "✅ صحيح!";
+                nextButton.className = "correct";
             } else {
-                result.innerText = `❌ إجابة خاطئة! الشكل الصحيح هو ${question.shape}`;
-                result.className = 'wrong';
+                nextButton.innerText = `❌ خطأ! الإجابة الصحيحة هي ${shape.name}.`;
+                nextButton.className = "wrong";
             }
-            result.style.display = 'block';
+            nextButton.style.display = "block";
+        }
 
-            document.querySelectorAll('.button').forEach((button, btnIndex) => {
-                if (btnIndex === index) {
-                    button.className += selectedAnswer === question.shape ? ' correct' : ' wrong';
-                }
-                button.disabled = true;
-            });
-            
+        document.getElementById("next").onclick = function() {
             currentQuestion++;
-
-            if (currentQuestion < questions.length) {
-                setTimeout(loadQuestion, 2000);
+            if (currentQuestion < shapes.length) {
+                loadQuestion();
             } else {
-                setTimeout(showResult, 2000);
+                showResult();
             }
         }
 
         function showResult() {
-            document.querySelector('.container').innerHTML = `
-                <h2>نتيجتك: ${score} من ${questions.length}</h2>
-                <p>${score === questions.length ? 'رائع! كل الأشكال كانت صحيحة!' : 'جيد جداً! استمر في التعلم!'}</p>
-                <button class="button" onclick="restartGame()">إعادة اللعب</button>
-            `;
+            document.querySelector('.container').style.display = 'none';
+            document.querySelector('.result').style.display = 'block';
+            document.getElementById("score").innerText = score;
+            document.getElementById("message").innerText = score >= 3 ? "أحسنت! لديك موهبة!" : "تحسّن أكثر في المرة القادمة!";
         }
 
-        function restartGame() {
+        function restart() {
             currentQuestion = 0;
             score = 0;
-            document.querySelector('.container').innerHTML = `
-                <div id="progress"><span></span></div>
-                <div class="shape" id="shape"></div>
-                <h2 id="question"></h2>
-                <button class="button" onclick="checkAnswer(0)"></button>
-                <button class="button" onclick="checkAnswer(1)"></button>
-                <button class="button" onclick="checkAnswer(2)"></button>
-                <div class="result" id="result"></div>
-                <button class="button" id="restart" style="display:none;" onclick="restartGame()">إعادة اللعب</button>
-            `;
+            document.querySelector('.result').style.display = 'none';
+            document.querySelector('.container').style.display = 'block';
             loadQuestion();
-        }
-
-        function updateProgress() {
-            const progressBar = document.querySelector('#progress span');
-            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
         }
 
         loadQuestion();
