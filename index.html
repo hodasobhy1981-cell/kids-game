@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة أسئلة وأجوبة</title>
+    <title>لعبة الحروف الإنجليزية</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f9f9f9;
+            background-color: #f0f8ff;
             color: #333;
             text-align: center;
             padding: 20px;
@@ -17,98 +17,89 @@
             color: #ff6347;
         }
         .question {
-            font-size: 20px;
+            font-size: 3rem;
             margin: 20px 0;
         }
-        .choice {
-            background-color: #87ceeb;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            margin: 5px;
-            cursor: pointer;
-            font-size: 18px;
+        .options {
+            margin: 20px 0;
         }
-        .choice:hover {
-            background-color: #00bfff;
+        button {
+            font-size: 2rem;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
         }
         .result {
-            font-size: 24px;
-            margin-top: 20px;
+            font-size: 2rem;
+            margin-top: 30px;
             display: none;
-            color: #32cd32;
         }
     </style>
 </head>
 <body>
-    <h1>لعبة أسئلة وأجوبة عن الحيوانات</h1>
-    <div id="quiz">
-        <div class="question" id="question"></div>
-        <button class="choice" onclick="choose(0)"></button>
-        <button class="choice" onclick="choose(1)"></button>
-        <button class="choice" onclick="choose(2)"></button>
-    </div>
+    <h1>لعبة الحروف الإنجليزية</h1>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
     <div class="result" id="result"></div>
+    <button onclick="startGame()">ابدأ اللعبة</button>
+
     <script>
         const questions = [
-            {
-                question: "ما هو أسرع حيوان في العالم؟",
-                choices: ["النمري", "الفهد", "الحصان"],
-                answer: 1
-            },
-            {
-                question: "ما هو أكبر حيوان يعيش على الأرض؟",
-                choices: ["الفيل", "الحوت الأزرق", "الدب"],
-                answer: 1
-            },
-            {
-                question: "أي من هذه الحيوانات يعيش في الصحراء؟",
-                choices: ["الدب", "الجمل", "السمكة"],
-                answer: 1
-            },
-            {
-                question: "ما هو الحيوان الذي يمكن أن يطير؟",
-                choices: ["السلحفاة", "الخفاش", "الثعلب"],
-                answer: 1
-            },
-            {
-                question: "ما هو الحيوان الذي يعتبر رمز القوة؟",
-                choices: ["الأرنب", "الأسد", "الطائر"],
-                answer: 1
-            }
+            { letter: 'A', options: ['A', 'b', 'C'], answer: 'A' },
+            { letter: 'b', options: ['D', 'B', 'b'], answer: 'b' },
+            { letter: 'C', options: ['c', 'A', 'C'], answer: 'C' },
+            { letter: 'd', options: ['D', 'E', 'd'], answer: 'd' },
+            { letter: 'E', options: ['e', 'f', 'E'], answer: 'E' }
         ];
         
-        let currentQuestion = 0;
+        let currentQuestionIndex = 0;
         let score = 0;
-        
-        function loadQuestion() {
-            if (currentQuestion < questions.length) {
-                document.getElementById("question").innerText = questions[currentQuestion].question;
-                const choices = document.querySelectorAll(".choice");
-                choices.forEach((choice, index) => {
-                    choice.innerText = questions[currentQuestion].choices[index];
+
+        function startGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById('result').style.display = 'none';
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                const question = questions[currentQuestionIndex];
+                document.getElementById('question').innerText = question.letter;
+                const optionsContainer = document.getElementById('options');
+                optionsContainer.innerHTML = '';
+                question.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.innerText = option;
+                    button.onclick = () => checkAnswer(option);
+                    optionsContainer.appendChild(button);
                 });
             } else {
                 showResult();
             }
         }
-        
-        function choose(index) {
-            if (index === questions[currentQuestion].answer) {
+
+        function checkAnswer(selectedOption) {
+            if (selectedOption === questions[currentQuestionIndex].answer) {
                 score++;
             }
-            currentQuestion++;
-            loadQuestion();
+            currentQuestionIndex++;
+            nextQuestion();
         }
-        
+
         function showResult() {
-            document.getElementById("quiz").style.display = 'none';
-            const result = document.getElementById("result");
-            result.innerText = `لقد حصلت على ${score} من ${questions.length}`;
-            result.style.display = 'block';
+            document.getElementById('question').innerText = '';
+            document.getElementById('options').innerHTML = '';
+            document.getElementById('result').innerText = `لقد حصلت على ${score} من ${questions.length} نقاط!`;
+            document.getElementById('result').style.display = 'block';
         }
-        
-        loadQuestion();
     </script>
 </body>
 </html>
