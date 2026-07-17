@@ -4,151 +4,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة الأشكال الهندسية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400&display=swap" rel="stylesheet">
+    <title>لعبة أسئلة وأجوبة عن وسائل المواصلات</title>
     <style>
         body {
             font-family: 'Fredoka', sans-serif;
-            background: linear-gradient(135deg, #f1c40f, #e67e22);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
+            background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+            text-align: center;
+            padding: 20px;
         }
-        .container {
+        .card {
             background: white;
             border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            margin: 20px auto;
             width: 90%;
             max-width: 400px;
         }
-        .shape {
-            margin: 20px 0;
-            width: 100px;
-            height: 100px;
-        }
-        #progress {
-            margin-bottom: 20px;
-            height: 10px;
-            background-color: #ddd;
-            border-radius: 5px;
-        }
-        #progress-bar {
-            height: 100%;
-            background-color: #3498db;
-            width: 0;
-            border-radius: 5px;
-        }
         button {
-            background: #3498db;
-            color: white;
             border: none;
-            border-radius: 10px;
-            padding: 10px 20px;
+            border-radius: 25px;
+            padding: 15px;
             font-size: 18px;
+            background: #007bff;
+            color: white;
             cursor: pointer;
-            transition: all 0.3s;
+            width: 100%;
+            margin: 10px 0;
+            transition: background 0.3s;
         }
         button:hover {
-            background: #2980b9;
+            background: #0056b3;
+        }
+        .progress {
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #4caf50;
+            width: 0%;
+            border-radius: 10px;
         }
         .result {
             display: none;
+            font-size: 22px;
         }
         .correct {
             color: green;
         }
-        .wrong {
+        .incorrect {
             color: red;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="progress"><div id="progress-bar"></div></div>
-        <div class="shape" id="shape"></div>
-        <h2 id="question"></h2>
-        <div id="options"></div>
-        <button id="next" style="display: none;">التالي</button>
-    </div>
-    <div class="container result">
-        <h2>نتيجتك: <span id="score"></span>/5</h2>
-        <p id="message"></p>
-        <button onclick="restart()">إعادة اللعب</button>
-    </div>
-    <script>
-        const shapes = [
-            { name: "مربع", css: "background: blue; width: 150px; height: 150px;" },
-            { name: "دائرة", css: "background: red; border-radius: 50%; width: 150px; height: 150px;" },
-            { name: "مثلث", css: "width: 0; height: 0; border-left: 75px solid transparent; border-right: 75px solid transparent; border-bottom: 150px solid green;" },
-            { name: "مستطيل", css: "background: orange; width: 200px; height: 100px;" },
-            { name: "نجمة", css: "clip-path: polygon(50% 0%, 63% 35%, 98% 35%, 72% 57%, 80% 91%, 50% 70%, 20% 91%, 28% 57%, 2% 35%, 37% 35%); background: purple; width: 100px; height: 100px;" },
-            { name: "قلب", css: "background: red; width: 100px; height: 100px; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);" }
-        ];
 
-        let currentQuestion = 0;
-        let score = 0;
+<div class="card" id="quiz">
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <h2 id="question"></h2>
+    <div id="options"></div>
+    <div id="result" class="result"></div>
+</div>
 
-        function loadQuestion() {
-            const shape = shapes[currentQuestion];
-            document.getElementById("shape").setAttribute("style", shape.css);
-            document.getElementById("question").innerText = `ما اسم الشكل؟`;
-            document.getElementById("options").innerHTML = `
-                <button onclick="checkAnswer('${shape.name}')">${shape.name}</button>
-                <button onclick="checkAnswer('${shapes[(currentQuestion + 1) % shapes.length].name}')">${shapes[(currentQuestion + 1) % shapes.length].name}</button>
-                <button onclick="checkAnswer('${shapes[(currentQuestion + 2) % shapes.length].name}')">${shapes[(currentQuestion + 2) % shapes.length].name}</button>
-            `;
-            document.getElementById("next").style.display = "none";
-            updateProgress();
+<script>
+    const questions = [
+        { emoji: "🚗", answer: "سيارة", options: ["قطار", "سيارة", "حافلة"] },
+        { emoji: "✈️", answer: "طيارة", options: ["سفينة", "دراجة", "طيارة"] },
+        { answer: "قطار", emoji: "🚆", options: ["طائرة", "دراجة", "قطار"] },
+        { answer: "سفينة", emoji: "🚢", options: ["سيارة", "سفينة", "حافلة"] },
+        { emoji: "🚲", answer: "دراجة", options: ["حافلة", "سيارة", "دراجة"] },
+    ];
+
+    let currentQuestion = 0;
+    let correctAnswers = 0;
+
+    function loadQuestion() {
+        const questionData = questions[currentQuestion];
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const progressBar = document.getElementById('progressBar');
+
+        progressBar.style.width = ((currentQuestion + 1) / questions.length) * 100 + '%';
+
+        if (questionData.emoji) {
+            questionEl.textContent = questionData.emoji;
+        } else {
+            questionEl.textContent = questionData.answer;
         }
 
-        function updateProgress() {
-            const progressBar = document.getElementById("progress-bar");
-            progressBar.style.width = (currentQuestion + 1) * 20 + '%';
+        optionsEl.innerHTML = '';
+
+        questionData.options.forEach(option => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.onclick = () => checkAnswer(option);
+            optionsEl.appendChild(button);
+        });
+    }
+
+    function checkAnswer(selected) {
+        const questionData = questions[currentQuestion];
+        const resultEl = document.getElementById('result');
+
+        if (selected === questionData.answer) {
+            correctAnswers++;
+            resultEl.textContent = "✅ إجابة صحيحة!";
+            resultEl.className = 'result correct';
+        } else {
+            resultEl.textContent = `❌ إجابة خاطئة! الإجابة الصحيحة هي: ${questionData.answer}`;
+            resultEl.className = 'result incorrect';
         }
 
-        function checkAnswer(answer) {
-            const shape = shapes[currentQuestion];
-            const nextButton = document.getElementById("next");
-            if (answer === shape.name) {
-                score++;
-                nextButton.innerText = "✅ صحيح!";
-                nextButton.className = "correct";
-            } else {
-                nextButton.innerText = `❌ خطأ! الإجابة الصحيحة هي ${shape.name}.`;
-                nextButton.className = "wrong";
-            }
-            nextButton.style.display = "block";
-        }
-
-        document.getElementById("next").onclick = function() {
-            currentQuestion++;
-            if (currentQuestion < shapes.length) {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            setTimeout(() => {
+                resultEl.textContent = '';
                 loadQuestion();
-            } else {
-                showResult();
-            }
+            }, 2000);
+        } else {
+            setTimeout(showResult, 2000);
         }
+    }
 
-        function showResult() {
-            document.querySelector('.container').style.display = 'none';
-            document.querySelector('.result').style.display = 'block';
-            document.getElementById("score").innerText = score;
-            document.getElementById("message").innerText = score >= 3 ? "أحسنت! لديك موهبة!" : "تحسّن أكثر في المرة القادمة!";
-        }
+    function showResult() {
+        const quizEl = document.getElementById('quiz');
+        quizEl.innerHTML = `
+            <h2>انتهت اللعبة!</h2>
+            <p>عدد الإجابات الصحيحة: ${correctAnswers} من ${questions.length}</p>
+            <button onclick="restart()">إعادة اللعب</button>
+        `;
+    }
 
-        function restart() {
-            currentQuestion = 0;
-            score = 0;
-            document.querySelector('.result').style.display = 'none';
-            document.querySelector('.container').style.display = 'block';
-            loadQuestion();
-        }
-
+    function restart() {
+        currentQuestion = 0;
+        correctAnswers = 0;
         loadQuestion();
-    </script>
+    }
+
+    loadQuestion();
+</script>
+
 </body>
 </html>
