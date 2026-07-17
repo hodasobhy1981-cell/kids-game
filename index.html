@@ -7,111 +7,128 @@
     <title>لعبة أصوات الحيوانات</title>
     <style>
         body {
-            background-color: #f0f8ff;
-            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            font-family: 'Arial', sans-serif;
             text-align: center;
         }
-        .question-card {
-            background-color: #ffffff;
+        .question-container {
+            background: white;
             border-radius: 15px;
             padding: 20px;
-            margin: 20px auto;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        #progress {
-            font-size: 20px;
-            margin-bottom: 20px;
+        .emoji {
+            font-size: 100px;
         }
         .button {
-            background-color: #007bff;
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 10px;
-            padding: 15px 25px;
+            padding: 15px;
             font-size: 20px;
+            margin: 10px;
             cursor: pointer;
-            width: 100%;
-            margin: 10px 0;
-            transition: background 0.3s;
-        }
-        .button:hover {
-            background-color: #0056b3;
+            width: 80%;
         }
         .result {
             font-size: 24px;
             margin: 20px;
         }
-        .correct {
-            color: green;
+        .progress {
+            font-size: 18px;
+            margin-bottom: 20px;
         }
-        .incorrect {
-            color: red;
+        .success {
+            background-color: lightgreen;
+        }
+        .error {
+            background-color: lightcoral;
         }
     </style>
 </head>
 <body>
-    <div id="progress">السؤال 1 من 5</div>
-    <div class="question-card" id="question-card">
-        <div id="question"></div>
-        <button class="button" onclick="checkAnswer('مواء')">مواء</button>
-        <button class="button" onclick="checkAnswer('نباح')">نباح</button>
-        <button class="button" onclick="checkAnswer('خوار')">خوار</button>
-    </div>
-    <div id="result-card" style="display:none;">
-        <div class="result" id="result-text"></div>
-        <button class="button" onclick="restartGame()">إعادة اللعب</button>
-    </div>
 
-    <script>
-        const questions = [
-            { emoji: '🐱', correct: 'مواء' },
-            { emoji: '🐶', correct: 'نباح' },
-            { emoji: '🐄', correct: 'خوار' },
-            { emoji: '🦁', correct: 'زئير' },
-            { emoji: '🐔', correct: 'صياح' },
-        ];
+<div class="progress" id="progress">السؤال 1 من 5</div>
+<div class="question-container" id="questionContainer">
+    <div class="emoji" id="emoji">🐶</div>
+    <div id="questionText">ماذا يقول هذا الحيوان؟</div>
+    <button class="button" onclick="checkAnswer('نباح', 0)">نباح</button>
+    <button class="button" onclick="checkAnswer('مواء', 1)">مواء</button>
+    <button class="button" onclick="checkAnswer('خوار', 2)">خوار</button>
+</div>
 
-        let currentQuestion = 0;
-        let score = 0;
+<div id="resultScreen" style="display:none;">
+    <div class="result" id="resultText"></div>
+    <button class="button" onclick="restartGame()">إعادة اللعب</button>
+</div>
 
-        function loadQuestion() {
-            if (currentQuestion < questions.length) {
-                document.getElementById("question").innerHTML = questions[currentQuestion].emoji;
-                document.getElementById("progress").innerHTML = `السؤال ${currentQuestion + 1} من ${questions.length}`;
-            } else {
-                showResult();
-            }
+<script>
+    const questions = [
+        { emoji: "🐶", correct: "نباح" },
+        { emoji: "🐱", correct: "مواء" },
+        { emoji: "🐄", correct: "خوار" },
+        { emoji: "🦁", correct: "زئير" },
+        { emoji: "🐔", correct: "صوص" }
+    ];
+    const answers = [
+        ["نباح", "مواء", "خوار"],
+        ["مواء", "نباح", "خوار"],
+        ["خوار", "مواء", "زئير"],
+        ["زئير", "مواء", "نباح"],
+        ["صوص", "خوار", "نباح"]
+    ];
+    let currentQuestion = 0;
+    let score = 0;
+
+    function checkAnswer(selected, index) {
+        const correct = questions[currentQuestion].correct;
+        if (selected === correct) {
+            score++;
+            document.getElementById('questionContainer').classList.add('success');
+            setTimeout(() => document.getElementById('questionContainer').classList.remove('success'), 1000);
+        } else {
+            document.getElementById('questionContainer').classList.add('error');
+            setTimeout(() => document.getElementById('questionContainer').classList.remove('error'), 1000);
+            alert(`الإجابة الصحيحة هي: ${correct}`);
         }
-
-        function checkAnswer(answer) {
-            const correctAnswer = questions[currentQuestion].correct;
-            if (answer === correctAnswer) {
-                score++;
-                alert('👍 إجابة صحيحة! ✅');
-            } else {
-                alert(`❌ إجابة خاطئة! الإجابة الصحيحة هي ${correctAnswer}`);
-            }
-            currentQuestion++;
+        
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
             loadQuestion();
+        } else {
+            showResults();
         }
+    }
 
-        function showResult() {
-            document.getElementById("question-card").style.display = "none";
-            document.getElementById("result-card").style.display = "block";
-            document.getElementById("result-text").innerHTML = `لقد أجبت بشكل صحيح على ${score} من ${questions.length} أسئلة! تتمنى لك التوفيق! 🎉`;
-        }
+    function loadQuestion() {
+        document.getElementById('progress').innerText = `السؤال ${currentQuestion + 1} من ${questions.length}`;
+        document.getElementById('emoji').innerText = questions[currentQuestion].emoji;
+        const buttons = document.querySelectorAll(".button");
+        buttons.forEach((button, index) => {
+            button.innerText = answers[currentQuestion][index];
+        });
+    }
 
-        function restartGame() {
-            currentQuestion = 0;
-            score = 0;
-            document.getElementById("result-card").style.display = "none";
-            document.getElementById("question-card").style.display = "block";
-            loadQuestion();
-        }
+    function showResults() {
+        document.getElementById('questionContainer').style.display = 'none';
+        document.getElementById('progress').style.display = 'none';
+        document.getElementById('resultText').innerText = `لقد أجبت بشكل صحيح على ${score} من ${questions.length} أسئلة!`;
+        document.getElementById('resultScreen').style.display = 'block';
+    }
 
+    function restartGame() {
+        currentQuestion = 0;
+        score = 0;
+        document.getElementById('resultScreen').style.display = 'none';
+        document.getElementById('questionContainer').style.display = 'block';
+        document.getElementById('progress').style.display = 'block';
         loadQuestion();
-    </script>
+    }
+
+    loadQuestion();
+</script>
+
 </body>
 </html>
